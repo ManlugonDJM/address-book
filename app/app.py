@@ -74,7 +74,7 @@ def create_address(
         db.rollback()
         logging.error(f"Create address: {str(e)}")
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Address with this latitude and longitude already exists",
         )
 
@@ -95,7 +95,9 @@ def read_address(address_id: int, db: Session = Depends(get_db)) -> models.Addre
     )
     if not db_address:
         logging.error(f"Address with ID {address_id} not found")
-        raise HTTPException(status_code=404, detail="Address not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Address not found"
+        )
     return db_address
 
 
@@ -131,7 +133,7 @@ def update_address(
         db.rollback()
         logging.error(f"Update address: {str(e)}")
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Address with this latitude and longitude already exists",
         )
 
@@ -144,14 +146,16 @@ def update_address(
 def delete_address(address_id: int, db: Session = Depends(get_db)):
     """
     Delete an address by its ID.
-    Returns a message indicating that the address was deleted if it exists, otherwise raises a 404 error.
+    Deletes the address if it exists, otherwise raises a 404 error.
     """
     db_address = (
         db.query(models.Address).filter(models.Address.id == address_id).first()
     )
     if not db_address:
         logging.error(f"Address with ID {address_id} not found")
-        raise HTTPException(status_code=404, detail="Address not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Address not found"
+        )
     db.delete(db_address)
     db.commit()
 
