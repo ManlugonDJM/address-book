@@ -24,7 +24,12 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Set up logging
-logging.basicConfig(filename="app.log", level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    filename="app.log",
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
 
 def get_db():
     """
@@ -46,8 +51,15 @@ def read_root() -> dict[str, str]:
     return {"message": "Hello World"}
 
 
-@app.post("/addresses/", response_model=schemas.Address, tags=["Address Book"])
-def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)) -> models.Address:
+@app.post(
+    "/addresses/",
+    status_code=201,
+    response_model=schemas.Address,
+    tags=["Address Book"],
+)
+def create_address(
+    address: schemas.AddressCreate, db: Session = Depends(get_db)
+) -> models.Address:
     """
     Create a new address.
     Returns the created address.
@@ -61,29 +73,48 @@ def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)
     except IntegrityError as e:
         db.rollback()
         logging.error(f"Create address: {str(e)}")
-        raise HTTPException(status_code=400, detail="Address with this latitude and longitude already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="Address with this latitude and longitude already exists",
+        )
 
 
-@app.get("/addresses/{address_id}", response_model=schemas.Address, tags=["Address Book"])
+@app.get(
+    "/addresses/{address_id}",
+    status_code=200,
+    response_model=schemas.Address,
+    tags=["Address Book"],
+)
 def read_address(address_id: int, db: Session = Depends(get_db)) -> models.Address:
     """
     Get an address by its ID.
     Returns the address if it exists, otherwise raises a 404 error.
     """
-    db_address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    db_address = (
+        db.query(models.Address).filter(models.Address.id == address_id).first()
+    )
     if not db_address:
         logging.error(f"Address with ID {address_id} not found")
         raise HTTPException(status_code=404, detail="Address not found")
     return db_address
 
 
-@app.put("/addresses/{address_id}", response_model=schemas.Address, tags=["Address Book"])
-def update_address(address_id: int, address: schemas.AddressUpdate, db: Session = Depends(get_db)) -> models.Address:
+@app.put(
+    "/addresses/{address_id}",
+    status_code=200,
+    response_model=schemas.Address,
+    tags=["Address Book"],
+)
+def update_address(
+    address_id: int, address: schemas.AddressUpdate, db: Session = Depends(get_db)
+) -> models.Address:
     """
     Update an address by its ID.
     Returns the updated address if it exists, otherwise raises a 404 error.
     """
-    db_address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    db_address = (
+        db.query(models.Address).filter(models.Address.id == address_id).first()
+    )
     if not db_address:
         logging.error(f"Address with ID {address_id} not found")
         raise HTTPException(status_code=404, detail="Address not found")
@@ -99,25 +130,34 @@ def update_address(address_id: int, address: schemas.AddressUpdate, db: Session 
     except IntegrityError as e:
         db.rollback()
         logging.error(f"Update address: {str(e)}")
-        raise HTTPException(status_code=400, detail="Address with this latitude and longitude already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="Address with this latitude and longitude already exists",
+        )
 
 
-@app.delete("/addresses/{address_id}", tags=["Address Book"])
-def delete_address(address_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
+@app.delete("/addresses/{address_id}", status_code=204, tags=["Address Book"])
+def delete_address(address_id: int, db: Session = Depends(get_db)):
     """
     Delete an address by its ID.
     Returns a message indicating that the address was deleted if it exists, otherwise raises a 404 error.
     """
-    db_address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    db_address = (
+        db.query(models.Address).filter(models.Address.id == address_id).first()
+    )
     if not db_address:
         logging.error(f"Address with ID {address_id} not found")
         raise HTTPException(status_code=404, detail="Address not found")
     db.delete(db_address)
     db.commit()
-    return {"message": "Address deleted"}
 
 
-@app.get("/addresses/", response_model=list[schemas.Address], tags=["Address Book"])
+@app.get(
+    "/addresses/",
+    status_code=200,
+    response_model=list[schemas.Address],
+    tags=["Address Book"],
+)
 def read_addresses_within_distance_km(
     latitude: float, longitude: float, distance: float, db: Session = Depends(get_db)
 ) -> list:
@@ -129,7 +169,10 @@ def read_addresses_within_distance_km(
     nearby_addresses = []
     for address in all_addresses:
         # Calculate the distance between the given location and the address
-        if geodesic((latitude, longitude), (address.latitude, address.longitude)).km <= distance:
+        if (
+            geodesic((latitude, longitude), (address.latitude, address.longitude)).km
+            <= distance
+        ):
             nearby_addresses.append(address)
-    
+
     return nearby_addresses
