@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from geopy.distance import geodesic
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
@@ -53,7 +53,7 @@ def read_root() -> dict[str, str]:
 
 @app.post(
     "/addresses/",
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     response_model=schemas.Address,
     tags=["Address Book"],
 )
@@ -81,7 +81,7 @@ def create_address(
 
 @app.get(
     "/addresses/{address_id}",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     response_model=schemas.Address,
     tags=["Address Book"],
 )
@@ -101,7 +101,7 @@ def read_address(address_id: int, db: Session = Depends(get_db)) -> models.Addre
 
 @app.put(
     "/addresses/{address_id}",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     response_model=schemas.Address,
     tags=["Address Book"],
 )
@@ -136,7 +136,11 @@ def update_address(
         )
 
 
-@app.delete("/addresses/{address_id}", status_code=204, tags=["Address Book"])
+@app.delete(
+    "/addresses/{address_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Address Book"],
+)
 def delete_address(address_id: int, db: Session = Depends(get_db)):
     """
     Delete an address by its ID.
@@ -154,7 +158,7 @@ def delete_address(address_id: int, db: Session = Depends(get_db)):
 
 @app.get(
     "/addresses/",
-    status_code=200,
+    status_code=status.HTTP_200_OK,
     response_model=list[schemas.Address],
     tags=["Address Book"],
 )
