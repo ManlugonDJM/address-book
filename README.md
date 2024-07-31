@@ -12,7 +12,12 @@ This is a simple address book application built with FastAPI. The application al
 
 ## Installation
 
-1. Extract the zip file to your desired location.
+1. Clone the repository:
+
+    ```sh
+    git clone https://github.com/ManlugonDJM/address-book.git
+    cd address-book
+    ```
 
 2. Create a virtual environment:
 

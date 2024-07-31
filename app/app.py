@@ -60,7 +60,7 @@ def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)
         return db_address
     except IntegrityError as e:
         db.rollback()
-        logging.error(f"Error creating address: {str(e)}")
+        logging.error(f"Create address: {str(e)}")
         raise HTTPException(status_code=400, detail="Address with this latitude and longitude already exists")
 
 
@@ -98,7 +98,7 @@ def update_address(address_id: int, address: schemas.AddressUpdate, db: Session 
         return db_address
     except IntegrityError as e:
         db.rollback()
-        logging.error(f"Error updating address: {str(e)}")
+        logging.error(f"Update address: {str(e)}")
         raise HTTPException(status_code=400, detail="Address with this latitude and longitude already exists")
 
 
