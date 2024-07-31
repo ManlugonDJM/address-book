@@ -2,7 +2,7 @@
 *env/
 *.db
 *.log
-__pycache__/
+__pycache__
 
 # Distribution / packaging
 .Python
