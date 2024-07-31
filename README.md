@@ -66,10 +66,11 @@ fastapi-address book/
 │
 ├── app/
 │   ├── __init__.py
-│   ├── main.py           # FastAPI application
+│   ├── app.py            # FastAPI application
 │   ├── models.py         # SQLAlchemy models
 │   ├── schemas.py        # Pydantic schemas
 |
+├── main.py               # Code runner
 ├── README.md             # This file
 ├── requirements.txt      # Project dependencies
 ├── app.log               # Log file for errors (generated after running the app)
